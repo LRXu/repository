@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<style type="text/css">
+#box {
+	margin: 0 auto;
+	width: 500px;
+	height: 300px;
+	border: 1px solid red;
+}
+
+#table1 {
+	margin: 0 auto;
+	width: 400px;
+	border: 1px solid blue;
+	text-align: center;
+}
+</style>
+</head>
+<body>
+
+	<div id="box">
+		<h3>修改</h3>
+		<form th:action="@{/updateUser}" method="POST">
+		<table id="table1">
+			<tr>
+				<th>uid</th>
+				<td><input type="text" name="uid" th:field="${user.uid}"/></td>
+			</tr>
+			<th>name</th>
+			<td><input type="text" name="name" th:field="${user.name}"/></td>
+			</tr>
+			<tr>
+				<th>age</th>
+				<td><input type="text" name="age" th:field="${user.age}" /></td>
+				<td><input type="submit" value="修改"></td>
+			</tr>
+		</table>
+		</form>
+		
+	</div>
+	
+	
+
+</body>
+</html>

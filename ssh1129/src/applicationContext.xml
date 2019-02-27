@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx 
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/aop 
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<!-- 导入db连接properties文件 -->
+	<context:property-placeholder location="classpath:db.properties" />
+	<!-- C3P0 -->
+	<bean name="dataSource"
+		class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="${driverClass}"></property>
+		<property name="jdbcUrl" value="${jdbcUrl}"></property>
+		<property name="user" value="${user}"></property>
+		<property name="password" value="${password}"></property>
+	</bean>
+
+	<!-- SessionFactory对象 -->
+	<!-- 方式1 -->
+	<!-- <bean name="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean"> 
+		<property name="configLocaltion" value="classpath:hibernate.cfg.xml"></property> 
+		</bean> -->
+
+	<!-- 方式2 -->
+	<bean name="sessionFactory"
+		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="hibernateProperties">
+			<props>
+				<!-- <prop key="hibernate.connection.driver_class">com.mysql.jdbc.Driver</prop> 
+					<prop key="hibernate.connection.url">jdbc:mysql:///test</prop> <prop key="hibernate.connection.username">root</prop> 
+					<prop key="hibernate.connection.password">123</prop> -->
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+			</props>
+		</property>
+		<!-- 映射文件 -->
+		<property name="mappingDirectoryLocations" value="classpath:com/ssh/domain"></property>
+	</bean>
+
+	<!-- HibernateTransactionManager -->
+	<bean name="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+
+	<!-- Advice -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="get*" isolation="READ_COMMITTED" propagation="SUPPORTS" read-only="true" />
+			<tx:method name="add*" isolation="READ_COMMITTED" propagation="SUPPORTS" read-only="false" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- aop -->
+	<aop:config>
+		<aop:pointcut expression="execution(* com.ssh.service.*Service.*(..))" id="pc" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="pc" />
+	</aop:config>
+
+	<!-- UserDao -->
+	<bean name="userDao" class="com.ssh.dao.UserDao">
+		<property name="SessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<!-- UserService -->
+	<bean name="userService" class="com.ssh.service.UserService">
+		<property name="uDao" ref="userDao"></property>
+	</bean>
+	
+	<!-- UserAction -->
+	<bean name="userAction" class="com.ssh.web.UserAction" scope="prototype">
+		<property name="userService" ref="userService"></property>
+	</bean>
+
+</beans>

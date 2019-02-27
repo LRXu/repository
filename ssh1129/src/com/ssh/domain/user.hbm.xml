@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<!-- 用于javaBean实体和数据表映射关系 name:实体类全路径名 table:数据表名称 -->
+	<class name="com.ssh.domain.User" table="users">
+		<!-- id:主键 name:实体类主键名称 column: 数据库主键字段名称 -->
+		<id name="id" column="id">
+			<!-- 主键生成策略 -->
+			<generator class="native"></generator>
+		</id>
+		<!-- property:主键之外所有映射字段 name:实体类字段名称 column:数据库列字段名称 -->
+		<property name="name" column="name"></property>
+	</class>
+</hibernate-mapping>
